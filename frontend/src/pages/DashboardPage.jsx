@@ -7,7 +7,7 @@ import ActivityLog from '../components/ActivityLog';
 import Header from '../components/Header';
 
 // IMPORTANT: Replace this with your actual deployed backend URL
-const SOCKET_URL = 'https://your-mern-backend.onrender.com';
+const SOCKET_URL = 'https://real-time-todo-board-lxd0.onrender.com/';
 // Establish a WebSocket connection to the server
 const socket = io(SOCKET_URL);
 
