@@ -88,7 +88,7 @@ exports.updateTask = async (req, res) => {
     }
 };
 
-[cite_start]// Controller for the "Smart Assign" feature [cite: 32]
+// Corrected smartAssign function
 exports.smartAssign = async (req, res) => {
     const { id } = req.params;
     const { userId } = req.body; // The user who clicked the button
