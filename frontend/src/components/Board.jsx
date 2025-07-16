@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import TaskCard from './TaskCard';
-import ConflictModal from './ConflictModal'; // Import the new component
+import ConflictModal from './conflict'; // Import the new component
 import api from '../services/api';
 
 const Board = ({ tasks, setTasks, socket }) => {
