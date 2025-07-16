@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import io from 'socket.io-client';
 import api from '../services/api';
-import Board from '../components/board';
-import ActivityLog from '../components/activitylog';
+import Board from '../components/Board';
+import ActivityLog from '../components/ActivityLog';
 import Header from '../components/Header';
 
 // IMPORTANT: Replace this with your actual deployed backend URL

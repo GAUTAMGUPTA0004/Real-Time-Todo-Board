@@ -1,6 +1,6 @@
 import React from 'react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import TaskCard from './taskcard';
+import TaskCard from './TaskCard';
 import api from '../services/api';
 
 const Board = ({ tasks, setTasks, socket }) => {
