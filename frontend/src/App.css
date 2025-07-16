@@ -557,3 +557,22 @@ body {
     background-color: #e3f2fd;
     border: 2px dashed #0079bf;
 }
+
+/* ... (keep all existing styles) ... */
+
+/* Conflict Modal Styles */
+.conflict-details {
+    background-color: #f4f5f7;
+    border: 1px solid #ddd;
+    padding: 15px;
+    margin: 20px 0;
+    border-radius: 6px;
+}
+
+.conflict-details pre {
+    margin: 0;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 13px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
