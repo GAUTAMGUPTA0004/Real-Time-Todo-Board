@@ -9,7 +9,6 @@ const TaskSchema = new mongoose.Schema({
     version: { type: Number, default: 1 } // For conflict handling
 }, { timestamps: true });
 
-// Ensure title is unique (within a board, though here it's global for simplicity)
-TaskSchema.index({ title: 1 }, { unique: true });
+
 
 module.exports = mongoose.model('Task', TaskSchema);
