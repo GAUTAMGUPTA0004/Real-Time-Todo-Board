@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Updated backend URL for Render deployment - ADDED /api prefix
-const API_URL = 'https://real-time-todo-board-19mv.onrender.com/api'; 
+const API_URL = 'https://real-time-todo-board-19mv.onrender.com/'; 
 
 // Create a configured instance of axios for making API requests
 const api = axios.create({
