@@ -6,12 +6,21 @@ const TaskForm = ({ socket, onClose }) => {
     const [description, setDescription] = useState('');
     const [priority, setPriority] = useState('Medium');
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [error, setError] = useState('');
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setError(''); // Clear any previous errors
         
         if (!title.trim()) {
-            alert('Task title is required');
+            setError('Task title is required');
+            return;
+        }
+
+        // Check if title is a column name (frontend validation)
+        const columnNames = ['Todo', 'In Progress', 'Done'];
+        if (columnNames.includes(title.trim())) {
+            setError('Task title cannot be a column name (Todo, In Progress, Done)');
             return;
         }
 
@@ -19,12 +28,16 @@ const TaskForm = ({ socket, onClose }) => {
         const userId = localStorage.getItem('userId');
 
         try {
+            console.log('Attempting to create task:', { title: title.trim(), description, priority, userId });
+            
             const response = await api.post('/tasks', {
                 title: title.trim(),
                 description: description.trim(),
                 priority,
                 userId
             });
+
+            console.log('Task created successfully:', response.data);
 
             // Emit socket event to notify all clients
             socket.emit('task-update', response.data);
@@ -39,10 +52,46 @@ const TaskForm = ({ socket, onClose }) => {
             
         } catch (error) {
             console.error('Error creating task:', error);
-            if (error.response && error.response.data && error.response.data.message) {
-                alert(error.response.data.message);
+            
+            // Enhanced error handling
+            if (error.response) {
+                const status = error.response.status;
+                const message = error.response.data?.message || 'Unknown error';
+                
+                console.log('Error response:', {
+                    status,
+                    message,
+                    data: error.response.data
+                });
+                
+                switch (status) {
+                    case 400:
+                        if (error.response.data?.code === 11000) {
+                            setError(`A task with the title "${title.trim()}" already exists. Please choose a different title.`);
+                        } else {
+                            setError(message);
+                        }
+                        break;
+                    case 401:
+                        setError('You are not authorized. Please log in again.');
+                        // Optionally redirect to login
+                        localStorage.clear();
+                        window.location.href = '/login';
+                        break;
+                    case 500:
+                        setError('Server error. Please try again later.');
+                        break;
+                    default:
+                        setError(message || 'Failed to create task. Please try again.');
+                }
+            } else if (error.request) {
+                // Network error
+                console.error('Network error:', error.request);
+                setError('Network error. Please check your connection and try again.');
             } else {
-                alert('Failed to create task. Please try again.');
+                // Other error
+                console.error('Unknown error:', error.message);
+                setError('An unexpected error occurred. Please try again.');
             }
         } finally {
             setIsSubmitting(false);
@@ -54,6 +103,20 @@ const TaskForm = ({ socket, onClose }) => {
             <div className="task-form-container">
                 <form onSubmit={handleSubmit} className="task-form">
                     <h3>Create New Task</h3>
+                    
+                    {/* Error display */}
+                    {error && (
+                        <div className="error-message" style={{
+                            color: 'red',
+                            backgroundColor: '#ffebee',
+                            padding: '10px',
+                            marginBottom: '15px',
+                            borderRadius: '4px',
+                            border: '1px solid #ffcdd2'
+                        }}>
+                            {error}
+                        </div>
+                    )}
                     
                     <div className="form-group">
                         <label htmlFor="title">Title *</label>
