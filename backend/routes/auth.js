@@ -1,5 +1,5 @@
 const express = require('express');
-const { register, login } = require('../controllers/authController');
+const { register, login } = require('../controllers/authcontroller');
 const router = express.Router();
 
 // Route to handle new user registration.

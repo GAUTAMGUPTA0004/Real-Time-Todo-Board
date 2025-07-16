@@ -1,5 +1,5 @@
 const express = require('express');
-const { getLogs } = require('../controllers/logController');
+const { getLogs } = require('../controllers/logcontroller');
 const router = express.Router();
 
 // Route to get the last 20 action logs.
