@@ -32,7 +32,7 @@ const Board = ({ tasks, setTasks, socket }) => {
             // Send the update request to the backend API
             const res = await api.put(`/tasks/${draggableId}`, updatedTaskData);
 
-            [cite_start]// Emit a 'task-update' event via WebSocket to notify all other clients [cite: 11]
+            // Emit a 'task-update' event via WebSocket to notify all other clients
             socket.emit('task-update', res.data);
 
         } catch (error) {
@@ -72,7 +72,8 @@ const Board = ({ tasks, setTasks, socket }) => {
                                         <Draggable key={task._id} draggableId={task._id} index={index}>
                                             {(provided) => (
                                                 <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-                                                    <TaskCard task={task} />
+                                                    {/* FIXED: Pass socket prop to TaskCard */}
+                                                    <TaskCard task={task} socket={socket} />
                                                 </div>
                                             )}
                                         </Draggable>
