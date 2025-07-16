@@ -6,7 +6,7 @@ exports.getLogs = async (req, res) => {
         // Fetch logs from the database.
         const logs = await ActionLog.find()
             .sort({ createdAt: -1 }) // Sort by creation date in descending order (newest first).
-            [cite_start].limit(20) // Limit the result to the last 20 actions[cite: 14].
+            .limit(20) // Limit the result to the last 20 actions.
             .populate('user', 'username'); // Replace the 'user' ID with the user's document (specifically the username).
         
         // Send the fetched logs as a JSON response.

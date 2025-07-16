@@ -28,7 +28,7 @@ exports.getAllTasks = async (req, res) => {
 exports.createTask = async (req, res) => {
     const { title, description, priority, userId } = req.body;
     
-    [cite_start]// Server-side validation: Task titles cannot match column names [cite: 38]
+    // Server-side validation: Task titles cannot match column names
     if (['Todo', 'In Progress', 'Done'].includes(title)) {
         return res.status(400).json({ message: "Task title cannot be a column name." });
     }
@@ -36,11 +36,11 @@ exports.createTask = async (req, res) => {
     try {
         const newTask = new Task({ title, description, priority });
         await newTask.save();
-        [cite_start]// Log the creation action [cite: 12]
+        // Log the creation action
         await logAction(userId, `created task "${title}"`, title);
         res.status(201).json(newTask);
     } catch (error) {
-        [cite_start]// Handle MongoDB unique index violation for the title [cite: 38]
+        // Handle MongoDB unique index violation for the title
         if (error.code === 11000) {
             return res.status(400).json({ message: "A task with this title already exists." });
         }
@@ -58,7 +58,7 @@ exports.updateTask = async (req, res) => {
         const task = await Task.findById(id);
         if (!task) return res.status(404).json({ message: "Task not found." });
 
-        [cite_start]// --- Conflict Handling Logic --- [cite: 16, 36]
+        // --- Conflict Handling Logic ---
         // Compare the version from the client with the version in the database
         if (task.version !== version) {
             // If they don't match, it means someone else updated the task.
@@ -79,7 +79,7 @@ exports.updateTask = async (req, res) => {
         task.version += 1; 
 
         const updatedTask = await task.save();
-        [cite_start]// Log the update action [cite: 12]
+        // Log the update action
         await logAction(userId, `updated task "${updatedTask.title}"`, updatedTask.title);
 
         res.json(updatedTask);
