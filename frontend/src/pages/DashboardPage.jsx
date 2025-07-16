@@ -5,6 +5,7 @@ import api from '../services/api';
 import Board from '../components/Board';
 import ActivityLog from '../components/ActivityLog';
 import Header from '../components/Header';
+import TaskForm from '../components/TaskForm';
 
 // Updated backend URL for Render deployment (without /api for socket connection)
 const SOCKET_URL = 'https://real-time-todo-board-19mv.onrender.com';
@@ -15,25 +16,40 @@ const DashboardPage = () => {
     // State to hold all tasks and action logs
     const [tasks, setTasks] = useState([]);
     const [logs, setLogs] = useState([]);
+    const [showTaskForm, setShowTaskForm] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
     const navigate = useNavigate();
 
     // Function to fetch all tasks from the backend
     const fetchTasks = async () => {
-        const response = await api.get('/tasks');
-        setTasks(response.data);
+        try {
+            const response = await api.get('/tasks');
+            setTasks(response.data);
+        } catch (error) {
+            console.error('Error fetching tasks:', error);
+        }
     };
 
     // Function to fetch the last 20 action logs
     const fetchLogs = async () => {
-        const response = await api.get('/logs');
-        setLogs(response.data);
+        try {
+            const response = await api.get('/logs');
+            setLogs(response.data);
+        } catch (error) {
+            console.error('Error fetching logs:', error);
+        }
     };
 
     // The useEffect hook runs after the component mounts
     useEffect(() => {
         // Fetch initial data when the component loads
-        fetchTasks();
-        fetchLogs();
+        const initializeData = async () => {
+            setIsLoading(true);
+            await Promise.all([fetchTasks(), fetchLogs()]);
+            setIsLoading(false);
+        };
+
+        initializeData();
 
         // --- Socket.IO Listeners ---
         // Listen for 'task-updated' events from the server
@@ -66,13 +82,52 @@ const DashboardPage = () => {
         navigate('/login');
     };
 
+    // Function to open task creation form
+    const handleCreateTask = () => {
+        setShowTaskForm(true);
+    };
+
+    // Function to close task creation form
+    const handleCloseTaskForm = () => {
+        setShowTaskForm(false);
+    };
+
+    if (isLoading) {
+        return (
+            <div className="dashboard-page">
+                <Header onLogout={handleLogout} />
+                <div className="loading-container">
+                    <div className="loading-spinner">Loading...</div>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="dashboard-page">
             <Header onLogout={handleLogout} />
+            
+            <div className="dashboard-controls">
+                <button 
+                    className="btn-primary create-task-btn"
+                    onClick={handleCreateTask}
+                >
+                    + Create New Task
+                </button>
+            </div>
+
             <main className="dashboard-main-content">
                 <Board tasks={tasks} setTasks={setTasks} socket={socket} />
                 <ActivityLog logs={logs} />
             </main>
+
+            {/* Task creation form modal */}
+            {showTaskForm && (
+                <TaskForm 
+                    socket={socket} 
+                    onClose={handleCloseTaskForm}
+                />
+            )}
         </div>
     );
 };
