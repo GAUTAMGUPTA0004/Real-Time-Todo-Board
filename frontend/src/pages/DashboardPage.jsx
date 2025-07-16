@@ -7,7 +7,7 @@ import ActivityLog from '../components/ActivityLog';
 import Header from '../components/Header';
 
 // Updated backend URL for Render deployment (without /api for socket connection)
-const SOCKET_URL = 'https://real-time-todo-board-lxd0.onrender.com';
+const SOCKET_URL = 'https://real-time-todo-board-19mv.onrender.com';
 // Establish a WebSocket connection to the server
 const socket = io(SOCKET_URL);
 
