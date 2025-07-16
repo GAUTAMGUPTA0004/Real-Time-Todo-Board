@@ -87,7 +87,31 @@ exports.updateTask = async (req, res) => {
         res.status(500).json({ message: "Error updating task" });
     }
 };
+// Add this new function to your taskcontroller.js
+exports.deleteTask = async (req, res) => {
+    const { id } = req.params;
+    // For logging, it's helpful to get the userId from the body or auth token
+    const { userId } = req.body; 
 
+    try {
+        // Find the task by its ID and delete it.
+        const task = await Task.findByIdAndDelete(id);
+
+        // If no task was found with that ID, return a 404 error.
+        if (!task) {
+            return res.status(404).send("Task not found");
+        }
+
+        // Log the delete action.
+        await logAction(userId, `deleted task "${task.title}"`, task.title);
+
+        // Send a success message.
+        res.json({ message: "Task deleted successfully." });
+    } catch (error) {
+        // Handle any potential server errors.
+        res.status(500).json({ message: "Error deleting task", error });
+    }
+};
 // Corrected smartAssign function
 exports.smartAssign = async (req, res) => {
     const { id } = req.params;
