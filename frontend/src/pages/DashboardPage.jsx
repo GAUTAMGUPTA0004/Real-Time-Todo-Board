@@ -7,10 +7,16 @@ import ActivityLog from '../components/ActivityLog';
 import Header from '../components/Header';
 import TaskForm from '../components/TaskForm';
 
-// Updated backend URL for Render deployment (without /api for socket connection)
+// Backend URL for Render deployment
 const SOCKET_URL = 'https://real-time-todo-board-19mv.onrender.com';
-// Establish a WebSocket connection to the server
-const socket = io(SOCKET_URL);
+
+// Socket configuration with proper CORS settings
+const socketOptions = {
+    withCredentials: true,
+    transports: ['websocket', 'polling'],
+    timeout: 20000,
+    forceNew: true
+};
 
 const DashboardPage = () => {
     // State to hold all tasks and action logs
@@ -18,6 +24,8 @@ const DashboardPage = () => {
     const [logs, setLogs] = useState([]);
     const [showTaskForm, setShowTaskForm] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+    const [socket, setSocket] = useState(null);
+    const [connectionStatus, setConnectionStatus] = useState('Connecting...');
     const navigate = useNavigate();
 
     // Function to fetch all tasks from the backend
@@ -27,6 +35,9 @@ const DashboardPage = () => {
             setTasks(response.data);
         } catch (error) {
             console.error('Error fetching tasks:', error);
+            if (error.response?.status === 401) {
+                navigate('/login');
+            }
         }
     };
 
@@ -42,6 +53,26 @@ const DashboardPage = () => {
 
     // The useEffect hook runs after the component mounts
     useEffect(() => {
+        // Initialize socket connection
+        const newSocket = io(SOCKET_URL, socketOptions);
+        setSocket(newSocket);
+
+        // Socket connection event handlers
+        newSocket.on('connect', () => {
+            console.log('Connected to server:', newSocket.id);
+            setConnectionStatus('Connected');
+        });
+
+        newSocket.on('disconnect', () => {
+            console.log('Disconnected from server');
+            setConnectionStatus('Disconnected');
+        });
+
+        newSocket.on('connect_error', (error) => {
+            console.error('Socket connection error:', error);
+            setConnectionStatus('Connection Error');
+        });
+
         // Fetch initial data when the component loads
         const initializeData = async () => {
             setIsLoading(true);
@@ -53,24 +84,25 @@ const DashboardPage = () => {
 
         // --- Socket.IO Listeners ---
         // Listen for 'task-updated' events from the server
-        socket.on('task-updated', (updatedData) => {
+        newSocket.on('task-updated', (updatedData) => {
+            console.log('Task updated via socket:', updatedData);
             // When an update is received, refetch all tasks to refresh the board
-            // This is a simple but effective way to ensure data consistency
             fetchTasks(); 
         });
         
         // Listen for 'logs-updated' events from the server
-        socket.on('logs-updated', (newLogs) => {
+        newSocket.on('logs-updated', (newLogs) => {
+            console.log('Logs updated via socket');
             // Update the logs state with the new data from the server
             setLogs(newLogs);
         });
 
         // --- Cleanup function ---
-        // This function runs when the component is unmounted
         return () => {
-            // It's important to remove the listeners to prevent memory leaks
-            socket.off('task-updated');
-            socket.off('logs-updated');
+            console.log('Cleaning up socket connection');
+            newSocket.off('task-updated');
+            newSocket.off('logs-updated');
+            newSocket.disconnect();
         };
     }, []); // The empty dependency array means this effect runs only once on mount
 
@@ -78,6 +110,10 @@ const DashboardPage = () => {
     const handleLogout = () => {
         // Clear user data from local storage
         localStorage.clear();
+        // Disconnect socket
+        if (socket) {
+            socket.disconnect();
+        }
         // Redirect to the login page
         navigate('/login');
     };
@@ -107,6 +143,17 @@ const DashboardPage = () => {
         <div className="dashboard-page">
             <Header onLogout={handleLogout} />
             
+            {/* Connection status indicator */}
+            <div className="connection-status" style={{
+                padding: '5px 10px',
+                backgroundColor: connectionStatus === 'Connected' ? '#4CAF50' : '#f44336',
+                color: 'white',
+                textAlign: 'center',
+                fontSize: '12px'
+            }}>
+                Socket Status: {connectionStatus}
+            </div>
+            
             <div className="dashboard-controls">
                 <button 
                     className="btn-primary create-task-btn"
@@ -122,7 +169,7 @@ const DashboardPage = () => {
             </main>
 
             {/* Task creation form modal */}
-            {showTaskForm && (
+            {showTaskForm && socket && (
                 <TaskForm 
                     socket={socket} 
                     onClose={handleCloseTaskForm}
