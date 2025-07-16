@@ -576,3 +576,24 @@ body {
     white-space: pre-wrap;
     word-wrap: break-word;
 }
+
+/* ... (keep all existing styles) ... */
+
+/* Add this new style for the edit button */
+.btn-edit {
+    background-color: #ff9f4a; /* A different color for edit */
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+
+.btn-edit:hover {
+    background-color: #e88e44;
+}
+
+/* ... (keep all other existing styles) ... */
