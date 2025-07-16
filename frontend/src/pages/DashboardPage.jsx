@@ -6,8 +6,8 @@ import Board from '../components/Board';
 import ActivityLog from '../components/ActivityLog';
 import Header from '../components/Header';
 
-// IMPORTANT: Replace this with your actual deployed backend URL
-const SOCKET_URL = 'https://real-time-todo-board-lxd0.onrender.com/';
+// Updated backend URL for Render deployment (without /api for socket connection)
+const SOCKET_URL = 'https://real-time-todo-board-lxd0.onrender.com';
 // Establish a WebSocket connection to the server
 const socket = io(SOCKET_URL);
 
@@ -36,14 +36,14 @@ const DashboardPage = () => {
         fetchLogs();
 
         // --- Socket.IO Listeners ---
-        [cite_start]// Listen for 'task-updated' events from the server [cite: 11]
+        // Listen for 'task-updated' events from the server
         socket.on('task-updated', (updatedData) => {
             // When an update is received, refetch all tasks to refresh the board
             // This is a simple but effective way to ensure data consistency
             fetchTasks(); 
         });
         
-        [cite_start]// Listen for 'logs-updated' events from the server [cite: 24]
+        // Listen for 'logs-updated' events from the server
         socket.on('logs-updated', (newLogs) => {
             // Update the logs state with the new data from the server
             setLogs(newLogs);
