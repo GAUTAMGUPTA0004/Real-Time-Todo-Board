@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
@@ -15,11 +16,14 @@ function App() {
             <div className="app">
                 {/* The Routes component defines the different navigation paths. */}
                 <Routes>
+                    {/* Landing page route */}
+                    <Route path="/" element={token ? <Navigate to="/dashboard" /> : <LandingPage />} />
+                    
                     {/* Route for the login page. */}
-                    <Route path="/login" element={<LoginPage />} />
+                    <Route path="/login" element={token ? <Navigate to="/dashboard" /> : <LoginPage />} />
                     
                     {/* Route for the registration page. */}
-                    <Route path="/register" element={<RegisterPage />} />
+                    <Route path="/register" element={token ? <Navigate to="/dashboard" /> : <RegisterPage />} />
                     
                     {/* A protected route for the main dashboard. */}
                     <Route 
@@ -30,8 +34,8 @@ function App() {
                     />
                     
                     {/* A catch-all route to handle undefined paths. */}
-                    {/* It redirects to the dashboard if logged in, otherwise to the login page. */}
-                    <Route path="*" element={<Navigate to={token ? "/dashboard" : "/login"} />} />
+                    {/* It redirects to the dashboard if logged in, otherwise to the landing page. */}
+                    <Route path="*" element={<Navigate to={token ? "/dashboard" : "/"} />} />
                 </Routes>
             </div>
         </Router>
