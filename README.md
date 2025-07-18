@@ -7,7 +7,7 @@ This is a full-stack MERN application that provides a real-time, collaborative K
 ## 🚀 Deployed App & Demo
 
 * **Live Application:** https://real-time-todo-board-lyart.vercel.app/
-* **Demo Video:** `[Link to Your Demo Video]`
+* **Demo Video:** https://www.loom.com/share/383fbd3625ad417fa0ca1de96d6db15e?sid=2fc6a877-844c-4bc6-acde-5f6287216b0f
 
 ---
 
